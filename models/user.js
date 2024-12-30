@@ -1,8 +1,14 @@
 const mongoose = require('mongoose')
 
-const menuSchema = new mongoose.Schema({
+
+const userSchema = new mongoose.Schema({
   nombre: { type: String, required: true},
-  ingredientes: { type: String, required: true},
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true},
+  chats: [    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Chat'
+  }],
 },
   {
     toJSON: {
@@ -15,4 +21,4 @@ const menuSchema = new mongoose.Schema({
   })
 
 
-module.exports = mongoose.model('Menu', menuSchema)
+module.exports = mongoose.model('User', userSchema)
