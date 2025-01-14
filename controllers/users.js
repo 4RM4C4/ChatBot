@@ -110,12 +110,12 @@ usersRouter.post('/logout', verifyToken, async (request, response, next) => {
   }
 } )
 
-usersRouter.patch('/:id', verifyToken, isAdmin, async (request, response, next) => {
+usersRouter.patch('/:id', validators.validate(validators.patchValidator),  verifyToken, isAdmin, async (request, response, next) => {
   try {
 
   
     const { id } = request.params;
-    const { admin } = request.body;
+    const { nombre, email, admin } = request.body;
     const user = await User.findById(id);
     if (!user) {
       return response.status(404).json({ error: "User not found" });
@@ -127,6 +127,12 @@ usersRouter.patch('/:id', verifyToken, isAdmin, async (request, response, next) 
       }
       user.admin = admin;
     }
+    if (typeof nombre !== "undefined") {
+      user.nombre = nombre;
+    }
+    if (typeof email !== "undefined") {
+      user.email = email
+    }
 
     const updatedUser = await user.save();
 
@@ -137,7 +143,7 @@ usersRouter.patch('/:id', verifyToken, isAdmin, async (request, response, next) 
   }
 } )
 
-usersRouter.post('/singupadmin', validators.validate(validators.singupValidator), async (request, response, next) => {
+/* usersRouter.post('/singupadmin', validators.validate(validators.singupValidator), async (request, response, next) => {
   try {
   const { nombre, email, password } = request.body
 
@@ -164,6 +170,6 @@ usersRouter.post('/singupadmin', validators.validate(validators.singupValidator)
   console.log(error)
   return response.status(500).json({ meessage: "ERROR", cause: error.message})
 }
-})
+}) */
 
 module.exports = usersRouter
