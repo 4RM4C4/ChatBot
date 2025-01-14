@@ -7,6 +7,11 @@ const singupValidator = [
   expressValidator.body("password").trim().isLength({ min: 6}).withMessage("Password should contain at leat 6 characters")
 ]
 
+const loginValidator = [
+  expressValidator.body("email").trim().isEmail().withMessage("Email is required"),
+  expressValidator.body("password").trim().isLength({ min: 6}).withMessage("Password should contain at leat 6 characters")
+]
+
 const validate = (validations) => {
   return async (req, res, next) => {
     for (let validation of validations) {
@@ -23,4 +28,5 @@ const validate = (validations) => {
 module.exports = {
   validate,
   singupValidator,
+  loginValidator,
 }

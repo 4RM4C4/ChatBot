@@ -5,10 +5,13 @@ let MONGODB_URI = process.env.NODE_ENV === 'test'
 ? process.env.TEST_MONGODB_URI
 : process.env.MONGODB_URI
 
-const SECRET = process.env.SECRET
+const JWT_SECRET = process.env.JWT_SECRET
+
+const COOKIE_SECRET = process.env.COOKIE_SECRET
 
 module.exports = {
   MONGODB_URI,
   PORT,
-  SECRET
+  JWT_SECRET,
+  COOKIE_SECRET
 }
