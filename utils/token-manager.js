@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken')
 const config = require('./config')
 
-const createToken = (id, email, expiresIn) => {
-  const payload = { id, email}
+const createToken = (id, email, admin, expiresIn) => {
+  const payload = { id, email, admin}
   const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: "1d"} )
   return token
 }
@@ -28,4 +28,12 @@ const verifyToken = async (req, res, next) => {
   })
 }
 
-module.exports = { createToken, verifyToken }
+const isAdmin = async (req, res, next) => {
+  console.log(res.locals.jwtData)
+  if(!res.locals.jwtData.admin){
+    return res.status(401).json({message: "User not admin"})
+  }
+  return next()
+}
+
+module.exports = { createToken, verifyToken, isAdmin }
