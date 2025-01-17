@@ -1,7 +1,7 @@
 const expressValidator = require('express-validator')
 const express = require('express')
 
-const singupValidator = [
+const signUpValidator = [
   expressValidator.body("nombre").notEmpty().withMessage("nombre is required").isString().withMessage('nombre must be a string'),
   expressValidator.body("email").trim().isEmail().withMessage("Email is required"),
   expressValidator.body("password").trim().isLength({ min: 6}).withMessage("Password should contain at leat 6 characters")
@@ -43,7 +43,7 @@ const validate = (validations) => {
 
 module.exports = {
   validate,
-  singupValidator,
+  signUpValidator,
   loginValidator,
   menuValidator,
   menuDeleteValidator,

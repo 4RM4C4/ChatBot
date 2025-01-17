@@ -3,14 +3,14 @@ const mongoose = require('mongoose')
 
 const carritoSchema = new mongoose.Schema({
   usuario: { type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'},
-  completado: { type: Boolean, required: true, default: false},
+    ref: 'User', required: true},
+  completado: { type: Boolean, default: false},
   dateCompletado: { type: Date },
   pedido: [
     {
       menu: { type: mongoose.Schema.Types.ObjectId,
-        ref: 'Menu', required: true },
-      cantidad: { type: Number, required: true, min: 1 },
+        ref: 'Menu' },
+      cantidad: { type: Number, min: 1 },
     }
   ],
 },

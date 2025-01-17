@@ -1,10 +1,9 @@
 const mongoose = require('mongoose')
-const crypto = require('crypto')
 
 const chatSchema = new mongoose.Schema({
-  id: { type: String, default: crypto.randomUUID()},
   role: { type: String, required: true},
   content: { type: String, required: true},
+  lastInteraction: { type: String }
 },
   {
     toJSON: {

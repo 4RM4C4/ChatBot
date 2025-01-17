@@ -1,12 +1,12 @@
 const usersRouter = require('express').Router()
-const User = require('../models/user.js')
 const bcrypt = require('bcrypt')
 const validators = require('../utils/validators.js')
 const { createToken, verifyToken, isAdmin } = require('../utils/token-manager.js')
+const userService = require('../services/userService.js')
 
-usersRouter.get('/getallusers', async (request, response) => {
+usersRouter.get('/getallusers', async (request, response, next) => {
   try {
-    const users = await User.find().select('-passwordHash').lean()
+    const users = await userService.getAll()
     response.json(users)
   } catch (error) {
     response.status(500).json({ message: "ERROR", cause: error.message });
@@ -17,7 +17,7 @@ usersRouter.post('/login', validators.validate(validators.loginValidator), async
   try {
   const { email, password } = request.body
 
-  const user = await User.findOne({ email })
+  const user = await userService.getUserByEmail({ email })
 
   if (!user) {
     return response.status(401).send("email is not registered")
@@ -33,8 +33,10 @@ usersRouter.post('/login', validators.validate(validators.loginValidator), async
   const expires = new Date();
   expires.setDate(expires.getDate() + 1)
   
-  response.cookie("auth_token", token, {path: "/", domain: "localhost", expires, httpOnly: true , signed: true})
-  response.status(200).json({ message: "OK", id: user._id.toString()})
+  response.cookie("auth_token", token, {path: "/", domain: "localhost", expires, httpOnly: true , signed: true, secure: false,})
+  response.status(200).json({
+    username: user.email,
+  })
 
   } catch (error) {
     console.log(error)
@@ -44,7 +46,7 @@ usersRouter.post('/login', validators.validate(validators.loginValidator), async
 
 usersRouter.get('/verify', verifyToken, async (request, response, next) => {
   try {
-    const user = await User.findById(response.locals.jwtData.id);
+    const user = await userService.getUserById(response.locals.jwtData.id);
 
    if (!user) {
      return response.status(401).send("Permissions not match")
@@ -58,11 +60,11 @@ usersRouter.get('/verify', verifyToken, async (request, response, next) => {
   }
 })
 
-usersRouter.post('/singup', validators.validate(validators.singupValidator), async (request, response, next) => {
+usersRouter.post('/signup', validators.validate(validators.signUpValidator), async (request, response, next) => {
   try {
   const { nombre, email, password } = request.body
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await userService.getUserByEmail({ email })
 
   if (existingUser) {
     return response.status(401).send("User already registered");
@@ -71,13 +73,7 @@ usersRouter.post('/singup', validators.validate(validators.singupValidator), asy
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
-  const user = new User({
-    nombre,
-    email,
-    passwordHash,
-  })
-
-  const savedUser = await user.save()
+  const savedUser = await userService.saveUser(nombre, email, passwordHash)
 
   response.status(201).json(savedUser.id)
 } catch (error) {
@@ -88,7 +84,7 @@ usersRouter.post('/singup', validators.validate(validators.singupValidator), asy
 
 usersRouter.post('/logout', verifyToken, async (request, response, next) => {
   try {
-    const user = await User.findById(response.locals.jwtData.id);
+    const user = await userService.getUserById(response.locals.jwtData.id);
     if (!user) {
       return response.status(401).send("User not registered OR Token malfunctioned");
     }
@@ -116,7 +112,7 @@ usersRouter.patch('/:id', validators.validate(validators.patchValidator),  verif
   
     const { id } = request.params;
     const { nombre, email, admin } = request.body;
-    const user = await User.findById(id);
+    const user = await userService.getUserById(id);
     if (!user) {
       return response.status(404).json({ error: "User not found" });
     }
@@ -143,7 +139,7 @@ usersRouter.patch('/:id', validators.validate(validators.patchValidator),  verif
   }
 } )
 
-/* usersRouter.post('/singupadmin', validators.validate(validators.singupValidator), async (request, response, next) => {
+/* usersRouter.post('/signupadmin', validators.validate(validators.signUpValidator), async (request, response, next) => {
   try {
   const { nombre, email, password } = request.body
 

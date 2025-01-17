@@ -2,7 +2,7 @@ const menuRouter = require('express').Router()
 const Menu = require('../models/menu.js')
 
 const validators = require('../utils/validators.js')
-const { createToken, verifyToken, isAdmin  } = require('../utils/token-manager.js')
+const { verifyToken, isAdmin  } = require('../utils/token-manager.js')
 
 menuRouter.get('/getAllMenus', verifyToken, async (request, response) => {
   try {
