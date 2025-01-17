@@ -4,15 +4,6 @@ const validators = require('../utils/validators.js')
 const { createToken, verifyToken, isAdmin } = require('../utils/token-manager.js')
 const userService = require('../services/userService.js')
 
-usersRouter.get('/getallusers', async (request, response, next) => {
-  try {
-    const users = await userService.getAll()
-    response.json(users)
-  } catch (error) {
-    response.status(500).json({ message: "ERROR", cause: error.message });
-  }
-})
-
 usersRouter.post('/login', validators.validate(validators.loginValidator), async (request, response, next) => {
   try {
   const { email, password } = request.body
@@ -39,23 +30,6 @@ usersRouter.post('/login', validators.validate(validators.loginValidator), async
   })
 
   } catch (error) {
-    console.log(error)
-    return response.status(500).json({ meessage: "ERROR", cause: error.message})
-  }
-})
-
-usersRouter.get('/verify', verifyToken, async (request, response, next) => {
-  try {
-    const user = await userService.getUserById(response.locals.jwtData.id);
-
-   if (!user) {
-     return response.status(401).send("Permissions not match")
-   }
-
-    return response.status(200).json({ message: "OK", id: user._id.toString()})
-
-  } catch (error) {
-    console.log(error)
     return response.status(500).json({ meessage: "ERROR", cause: error.message})
   }
 })
@@ -77,7 +51,6 @@ usersRouter.post('/signup', validators.validate(validators.signUpValidator), asy
 
   response.status(201).json(savedUser.id)
 } catch (error) {
-  console.log(error)
   return response.status(500).json({ meessage: "ERROR", cause: error.message})
 }
 })
@@ -99,9 +72,8 @@ usersRouter.post('/logout', verifyToken, async (request, response, next) => {
       path: "/",
     });
 
-    return response.status(200).json({ message: "OK", name: user.name, email: user.email });
+    return response.status(200).json({ message: "OK", nombre: user.nombre, email: user.email });
   } catch (error) {
-    console.log(error);
     return response.status(500).json({ message: "ERROR", cause: error.message });
   }
 } )
@@ -130,11 +102,10 @@ usersRouter.patch('/:id', validators.validate(validators.patchValidator),  verif
       user.email = email
     }
 
-    const updatedUser = await user.save();
+    await user.save();
 
-    response.json(updatedUser);
+    return response.status(204).json()
   } catch (error) {
-    console.log(error);
     return response.status(500).json({ message: "ERROR", cause: error.message });
   }
 } )
@@ -163,7 +134,6 @@ usersRouter.patch('/:id', validators.validate(validators.patchValidator),  verif
 
   response.status(201).json(savedUser.id)
 } catch (error) {
-  console.log(error)
   return response.status(500).json({ meessage: "ERROR", cause: error.message})
 }
 }) */

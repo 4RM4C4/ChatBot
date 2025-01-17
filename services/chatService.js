@@ -6,7 +6,6 @@ const Chat = require('../models/chat.js')
 
 
 async function procesarMensaje(message, lastInteraction, carrito, nombre) {
-  console.log(lastInteraction)
   const menu = await Menu.find()
   let respuesta
   switch (lastInteraction) {
@@ -64,7 +63,6 @@ async function procesarMensaje(message, lastInteraction, carrito, nombre) {
       break;
     case "pedido":
       const rollIndex = parseInt(message, 10) - 1;
-      console.log("rollindex: " + rollIndex)
       if (rollIndex >= 0 && rollIndex < menu.length) {
         respuesta = {
           intencion: `roll${rollIndex}`,

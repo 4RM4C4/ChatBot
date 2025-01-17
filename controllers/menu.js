@@ -34,14 +34,13 @@ menuRouter.post('/setMenu', verifyToken, isAdmin, validators.validate(validators
 
   response.status(201).json(savedMenu.id)
 } catch (error) {
-    console.log(error)
     return response.status(500).json({ meessage: "ERROR", cause: error.message})
 }
 })
 
 menuRouter.delete('/delMenu', verifyToken, isAdmin, validators.validate(validators.menuDeleteValidator), async (request, response, next) => {
   try {
-  const { nombre, categoria, ingredientes } = request.body
+  const { nombre } = request.body
 
   const existingMenu = await Menu.findOne({ nombre });
 
@@ -49,11 +48,10 @@ menuRouter.delete('/delMenu', verifyToken, isAdmin, validators.validate(validato
     return response.status(404).send("Menu not found");
   }
 
-  const deletedMenu = await Menu.deleteOne(existingMenu)
+  await Menu.deleteOne(existingMenu)
 
-  response.status(204).json(deletedMenu)
+  response.status(204)
 } catch (error) {
-    console.log(error)
     return response.status(500).json({ meessage: "ERROR", cause: error.message})
 }
 })
