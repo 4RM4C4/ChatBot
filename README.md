@@ -150,7 +150,30 @@
 #### `GET /api/chat/`
 - **Descripción**: Solicita el historial de chats del usuario correspondiente a la Cookie HttpOnly recibida.
 - **Requiere**: Necesita que el usuario este logeado y presente su Cookie HttpOnly.
-- **Respuesta**: Devuelve en caso exitoso el código 200 y un json con los chats.
+- **Respuesta**: Devuelve en caso exitoso el código 200 y un json con el historial de chats.
+```json
+  [{
+        "role": "system",
+        "content": "Bienvenido a ArmacaSushi\n    Por favor ingrese la opción deseada:\n    1. Ver menú\n    2. Hacer un pedido\n    3. Consultar horarios\n  ",
+        "lastInteraction": "welcome",
+        "id": "6789c57b702d9a848d8063e8"
+    },
+    {
+        "role": "user",
+        "content": "1",
+        "id": "6789c6d592ee3911b0c371a7"
+    }]
+```
+
+#### `POST /api/chat/`
+- **Descripción**: Envia un chat para que sea procesado.
+```json
+    {
+        "message": "20"
+    }
+```
+- **Requiere**: Necesita que el usuario este logeado y presente su Cookie HttpOnly.
+- **Respuesta**: Devuelve en caso exitoso el código 201 y un json con el historial de chats.
 ```json
   [{
         "role": "system",
