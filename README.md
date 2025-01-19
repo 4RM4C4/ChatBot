@@ -23,6 +23,9 @@
    PORT=3001
    JWT_SECRET=secret_JWT
    COOKIE_SECRET=secret_cookie
+   COOKIE_DOMAIN=localhost
+   COOKIE_NAME=cookiename
+   HUGGINGFACE_KEY=huggingfacekey
    ```
 
 ### Correr el proyecto
@@ -133,6 +136,40 @@
 - **Respuesta**: Devuelve en caso exitoso el id del producto creado con el código 201.
   ```json
     "678aa3ecf0d4e92ffdc5b146"
+  ```
+
+#### `POST /api/menu/setMultipleMenus`
+- **Descripción**: Carga en el menú el array dentro del json.
+```json
+  [{
+    "nombre": "Sushi de cangrejo gigante japonés y pepino",
+    "categoria": "Sushi",
+    "ingredientes": ["arroz", "cangrejo gigante japonés", "pepino", "pescado"]
+  },
+  {
+    "nombre": "Sushi de Hipocampo",
+    "categoria": "Sushi",
+    "ingredientes": ["arroz", "Hipocampo", "pescado"]
+  }]
+```
+- **Requiere**: Necesita que el usuario este logeado, presente su Cookie HttpOnly y tenga seteado admin: true en el sistema.
+- **Respuesta**: Devuelve en caso exitoso un json con los datos de la operación con el código 201.
+  ```json
+    {
+    "message": "Procesamiento completo.",
+    "exitosos": [
+        {
+            "nombre": "Sushi de cangrejo gigante japonés y pepino",
+            "id": "678aa3ecf0d4e92ffdc5b146"
+        },
+    ],
+    "errores": [
+        {
+            "nombre": "Sushi de Hipocampo",
+            "id": "678d65688855aa205f8d4187"
+        },
+    ]
+  }
   ```
 
 #### `DELETE /api/menu/delMenu`
