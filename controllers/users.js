@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const validators = require('../utils/validators.js')
 const { createToken, verifyToken, isAdmin } = require('../utils/token-manager.js')
 const userService = require('../services/userService.js')
+const config = require('../utils/config.js')
 
 usersRouter.post('/login', validators.validate(validators.loginValidator), async (request, response, next) => {
   try {
@@ -24,7 +25,7 @@ usersRouter.post('/login', validators.validate(validators.loginValidator), async
   const expires = new Date();
   expires.setDate(expires.getDate() + 1)
   
-  response.cookie("auth_token", token, {path: "/", domain: "localhost", expires, httpOnly: true , signed: true, secure: false,})
+  response.cookie(config.COOKIE_NAME, token, {path: "/", domain: config.COOKIE_DOMAIN, expires, httpOnly: true , signed: true, secure: false,})
   response.status(200).json({
     username: user.email,
   })

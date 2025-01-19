@@ -1,7 +1,7 @@
 const Menu = require('../models/menu.js')
 const CarritoService = require('./carritoService.js')
 const Chat = require('../models/chat.js')
-
+const HuggingFaceService = require('./huggingFaceService.js')
 
 
 
@@ -49,15 +49,57 @@ async function procesarMensaje(message, lastInteraction, carrito, nombre) {
           };
           break;
         default:
-          respuesta = {
-            intencion: "welcome",
-            mensaje: `Opción no válida. Por favor ingrese una opción:
-
-              1. Ver menú
-              2. Hacer un pedido
-              3. Consultar horarios`,
-            productos: [],
-          };
+          const intencion = await HuggingFaceService.clasificarIntencion(message)
+          switch (intencion) {
+            case "consultar horarios de apertura o cierre del local de comida":
+              respuesta = {
+                intencion: "welcome",
+                mensaje: `${nombre} nuestro restaurante está abierto de lunes a viernes de 12:00 PM a 10:00 PM
+                y los fines de semana de 1:00 PM a 11:00 PM.
+    
+                Por favor ingrese la opción deseada:
+    
+                1. Ver menú
+                2. Hacer un pedido
+                3. Consultar horarios`,
+                productos: []
+              };
+              break;
+            case "consultar los platos disponibles en el menú del local de comida":
+              respuesta = {
+                intencion: "welcome",
+                mensaje: `${nombre} nuestro menú incluye los siguientes rolls:
+    
+                ${menu.map((item) => item.nombre).join('\n')}
+    
+                Por favor ingrese la opción deseada:
+    
+                1. Ver menú
+                2. Hacer un pedido
+                3. Consultar horarios`,
+                productos: [],
+              };
+              break;
+            case "hacer un pedido o comprar comida del local":
+              respuesta = {
+                intencion: "pedido",
+                mensaje: `${nombre} indique el número del roll que desea ordenar:
+                  ${menu.map((item, index) => `${index + 1}. ${item.nombre}`).join('\n')}`,
+                productos: []
+              };
+              break;
+            default:
+              respuesta = {
+              intencion: "welcome",
+              mensaje: `Opción no válida. Por favor ingrese una opción:
+  
+                1. Ver menú
+                2. Hacer un pedido
+                3. Consultar horarios`,
+              productos: [],
+            };
+            break;
+          }
           break;
       }
       break;

@@ -38,6 +38,52 @@ menuRouter.post('/setMenu', verifyToken, isAdmin, validators.validate(validators
 }
 })
 
+menuRouter.post('/setMultipleMenus', verifyToken, isAdmin, async (request, response, next) => {
+    try {
+      const menus = request.body;
+
+      if (!Array.isArray(menus) || menus.length === 0) {
+        return response.status(400).json({ message: 'Debe enviar un array de menús.' });
+      }
+
+      const resultados = await Promise.all(
+        menus.map(async (menu) => {
+          const { nombre, categoria, ingredientes } = menu;
+
+          if (!nombre || !categoria || !ingredientes) {
+            return { nombre, error: 'Faltan campos obligatorios.' };
+          }
+
+          const existingMenu = await Menu.findOne({ nombre });
+          if (existingMenu) {
+            return { nombre, error: `El menú ${nombre} ya se encuentra está registrado.` };
+          }
+
+          const newMenu = new Menu({
+            nombre,
+            categoria,
+            ingredientes,
+          });
+
+          const savedMenu = await newMenu.save();
+          return { nombre, id: savedMenu.id };
+        })
+      );
+
+      const errores = resultados.filter((res) => res.error);
+      const exitosos = resultados.filter((res) => !res.error);
+
+      response.status(201).json({
+        message: 'Procesamiento completo.',
+        exitosos,
+        errores,
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error en el servidor.', cause: error.message });
+    }
+  }
+);
+
 menuRouter.delete('/delMenu', verifyToken, isAdmin, validators.validate(validators.menuDeleteValidator), async (request, response, next) => {
   try {
   const { nombre } = request.body
